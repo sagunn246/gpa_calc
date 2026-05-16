@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced NEB GPA Calculator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.25), transparent 25%),
+                radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.25), transparent 25%),
+                linear-gradient(135deg, #020617, #0f172a, #111827);
+            color: white;
+            padding: 30px 15px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fade 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .top-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .stat-title {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .subject-card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 22px;
+            transition: 0.3s ease;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background: rgba(96, 165, 250, 0.12);
+            border-radius: 50%;
+            top: -60px;
+            right: -60px;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+
+        .subject-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .subject-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .subject-type {
+            font-size: 12px;
+            background: rgba(59, 130, 246, 0.2);
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: #93c5fd;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            outline: none;
+            font-size: 15px;
+            transition: 0.25s;
+        }
+
+        input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.35);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        .subject-total {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #93c5fd;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-box {
+            margin-top: 35px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            padding: 35px;
+            text-align: center;
+            display: none;
+            animation: fade 0.5s ease;
+        }
+
+        .result-box h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .gpa-text {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #38bdf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .grade-text {
+            font-size: 1.5rem;
+            color: #facc15;
+            margin-bottom: 10px;
+        }
+
+        .remark {
+            color: #cbd5e1;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 35px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media(max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .gpa-text {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="hero">
+            <h1>NEB GPA Calculator</h1>
+            <p>
+                Class 12 GPA Calculator for Computer Engineering Students<br>
+                5 Subjects → 75 Theory + 25 Practical<br>
+                4 Subjects → 50 Theory + 50 Practical
+            </p>
+        </div>
+
+        <div class="top-stats">
+            <div class="stat-card">
+                <div class="stat-title">Total Subjects</div>
+                <div class="stat-value">9</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Highest GPA</div>
+                <div class="stat-value">4.0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Grading System</div>
+                <div class="stat-value">NEB</div>
+            </div>
+        </div>
+
+        <div class="subjects-grid" id="subjects"></div>
+
+        <div class="actions">
+            <button class="calculate-btn" onclick="calculateGPA()">
+                Calculate GPA
+            </button>
+
+            <button class="reset-btn" onclick="resetFields()">
+                Reset Marks
+            </button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <h2>Your Final GPA</h2>
+
+            <div class="gpa-text" id="gpaText">0.00</div>
+
+            <div class="grade-text" id="gradeText">Grade</div>
+
+            <div class="remark" id="remarkText"></div>
+        </div>
+
+        <div class="footer">
+            Advanced NEB GPA Calculator • Built with HTML CSS JavaScript
+        </div>
+
+    </div>
+
+    <script>
+
+        const subjects = [
+            { name: 'English', theory: 75, practical: 25, type: 'Theory + Practical' },
+            { name: 'Samajik', theory: 75, practical: 25, type: 'Theory + Practical' },
+            { name: 'Mathematics', theory: 75, practical: 25, type: 'Theory + Practical' },
+            { name: 'Physics', theory: 75, practical: 25, type: 'Theory + Practical' },
+            { name: 'Chemistry', theory: 75, practical: 25, type: 'Theory + Practical' },
+
+            { name: 'V.P', theory: 50, practical: 50, type: '50/50 Subject' },
+            { name: 'CT', theory: 50, practical: 50, type: '50/50 Subject' },
+            { name: 'CN', theory: 50, practical: 50, type: '50/50 Subject' },
+            { name: 'SEP', theory: 50, practical: 50, type: '50/50 Subject' }
+        ];
+
+        const subjectsContainer = document.getElementById('subjects');
+
+        subjects.forEach((sub, index) => {
+            subjectsContainer.innerHTML += `
+
+        <div class="subject-card">
+
+          <div class="subject-top">
+            <div class="subject-name">${sub.name}</div>
+            <div class="subject-type">${sub.type}</div>
+          </div>
+
+          <div class="input-group">
+            <label>Theory Marks (Out of ${sub.theory})</label>
+            <input type="number" min="0" max="${sub.theory}" id="theory${index}" placeholder="Enter theory marks">
+          </div>
+
+          <div class="input-group">
+            <label>Practical Marks (Out of ${sub.practical})</label>
+            <input type="number" min="0" max="${sub.practical}" id="practical${index}" placeholder="Enter practical marks">
+          </div>
+
+          <div class="subject-total" id="total${index}">
+            Total: 0 / 100
+          </div>
+
+        </div>
+
+      `;
+        });
+
+        function marksToGP(percentage) {
+            if (percentage >= 90) return 4.0;
+            if (percentage >= 80) return 3.6;
+            if (percentage >= 70) return 3.2;
+            if (percentage >= 60) return 2.8;
+            if (percentage >= 50) return 2.4;
+            if (percentage >= 40) return 2.0;
+            if (percentage >= 35) return 1.6;
+            return 0;
+        }
+
+        function getGrade(gpa) {
+            if (gpa >= 3.6) return 'A+';
+            if (gpa >= 3.2) return 'A';
+            if (gpa >= 2.8) return 'B+';
+            if (gpa >= 2.4) return 'B';
+            if (gpa >= 2.0) return 'C+';
+            if (gpa >= 1.6) return 'C';
+            return 'NG';
+        }
+
+        function getRemark(gpa) {
+            if (gpa >= 3.6) return 'Outstanding Performance 🔥';
+            if (gpa >= 3.2) return 'Very Good Performance ✨';
+            if (gpa >= 2.8) return 'Good Performance 👍';
+            if (gpa >= 2.0) return 'Keep Improving 📚';
+            return 'More Practice Needed';
+        }
+
+        function calculateGPA() {
+
+            let totalGP = 0;
+            let fail = false;
+            let totalMarks = 0;
+
+            for (let i = 0; i < subjects.length; i++) {
+
+                const theory = parseFloat(document.getElementById(`theory${i}`).value) || 0;
+                const practical = parseFloat(document.getElementById(`practical${i}`).value) || 0;
+
+                if (theory > subjects[i].theory || practical > subjects[i].practical) {
+                    alert(`Invalid marks in ${subjects[i].name}`);
+                    return;
+                }
+
+                const total = theory + practical;
+                totalMarks += total;
+
+                document.getElementById(`total${i}`).innerText = `Total: ${total} / 100`;
+
+                if (total < 35) {
+                    fail = true;
+                }
+
+                totalGP += marksToGP(total);
+            }
+
+            const finalGPA = (totalGP / subjects.length).toFixed(2);
+            const percentage = (totalMarks / 9).toFixed(2);
+
+            document.getElementById('resultBox').style.display = 'block';
+
+            document.getElementById('gpaText').innerText = fail ? 'NG' : finalGPA;
+
+            document.getElementById('gradeText').innerText = fail
+                ? 'Not Graded'
+                : `${getGrade(finalGPA)} • ${percentage}%`;
+
+            document.getElementById('remarkText').innerText = fail
+                ? 'You failed in one or more subjects.'
+                : getRemark(finalGPA);
+
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function resetFields() {
+
+            subjects.forEach((sub, index) => {
+                document.getElementById(`theory${index}`).value = '';
+                document.getElementById(`practical${index}`).value = '';
+                document.getElementById(`total${index}`).innerText = 'Total: 0 / 100';
+            });
+
+            document.getElementById('resultBox').style.display = 'none';
+        }
+
+    </script>
+
+</body>
+
+</html>
